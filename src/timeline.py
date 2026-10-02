@@ -1,16 +1,4 @@
-"""
-timeline.py
------------
-Stage 4: frame-by-frame states -> timeline segments and durations.
-
-A segment is a run of consecutive frames with the same state:
-    05:20 - 07:41  WALKING
-Each frame "covers" the time until the next sampled frame, so the
-durations add up to the length of the video.
-"""
-
 from collections import OrderedDict
-
 from src.classifier import STATES
 
 

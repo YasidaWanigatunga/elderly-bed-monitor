@@ -1,21 +1,3 @@
-"""
-run.py
-------
-One command to analyse ANY video (no ground truth needed):
-
-    python -m src.run path\to\video.mp4
-    python -m src.run path\to\video.mp4 --viz      (also save a video with the skeleton drawn)
-    python -m src.run path\to\video.mp4 --no-vlm   (agent uses temporal context only)
-
-It runs perception (YOLO pose + bed detection) and then the full pipeline:
-state machine -> timeline -> agent -> events -> alerts.
-
-Output:
-  outputs/features/<video>.csv
-  outputs/results/<video>.json             timeline, durations, events, alerts, summary
-  outputs/results/<video>_agent_trace.md   the agent's reasoning
-"""
-
 import argparse
 import json
 import sys

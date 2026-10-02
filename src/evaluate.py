@@ -1,15 +1,3 @@
-"""
-evaluate.py
------------
-Compare predictions with ground truth.
-
-State metrics (per sampled frame):
-  accuracy          fraction of frames with the correct state
-  per-state recall  of the frames that really were X, how many we called X
-  confusion matrix  rows = true state, columns = predicted state
-  duration error    predicted seconds in each state minus true seconds
-"""
-
 import csv
 from collections import Counter, defaultdict
 

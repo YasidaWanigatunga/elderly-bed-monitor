@@ -1,28 +1,3 @@
-"""
-pipeline.py
------------
-Runs the analysis stages on a video's features and writes the results.
-
-    features CSV (from perception.py)
-      -> classifier   (one frame at a time)
-      -> temporal     (smoothing + state machine)
-      -> timeline     (segments + durations)
-      -> agent        (reviews ambiguous segments: look back / forward / VLM)
-      -> events       (bed exit / return to bed)
-      -> alerts       (NORMAL / MONITOR / ALERT)
-      -> evaluation   (if ground truth exists)
-
-Run:
-  python -m src.pipeline seq1_exit_and_return
-  python -m src.pipeline --all          (every file in outputs/features)
-  python -m src.pipeline --all --no-vlm (agent uses temporal context only)
-  python -m src.pipeline --all --no-agent
-Output:
-  outputs/results/<name>.json           (timeline, events, alerts, summary, evaluation)
-  outputs/results/<name>_agent_trace.md (the agent's reasoning, step by step)
-  outputs/results/overall.json          (with --all: metrics over all videos)
-"""
-
 import argparse
 import csv
 import json

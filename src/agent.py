@@ -1,41 +1,3 @@
-"""
-agent.py
---------
-Stage 4b: the agent reviews the observations the rules are unsure about.
-
-Why an agent?
-  The rules and the state machine handle the clear cases cheaply. A few
-  moments are genuinely ambiguous from one frame (e.g. "is he sitting on the
-  bed or standing beside it?"). For those, the agent DECIDES it needs more
-  context and gathers it with tools, like a human reviewer would:
-
-    look_back(seconds)     what was the person doing just before?
-    look_forward(seconds)  what did the person do just after?
-    ask_vlm(frames, q)     show 1-3 video frames to a vision-language model
-                           (Groq, qwen/qwen3.8-27b) and ask a multiple-choice
-                           question
-
-  Only ambiguous segments are reviewed (a handful per video), so the
-  expensive VLM is called rarely: cheap, fast, and within the free tier.
-
-When does the agent step in? (triggers)
-  1. short_ambiguous_in_bed   a short "sitting on bed" segment with low
-                              confidence or the ambiguous_sit_or_stand flag
-                              (the 2-D box overlap problem)
-  2. unknown                  the state could not be determined
-  3. possible_fall            a horizontal body outside the bed region
-  4. implausible_transition   the state machine accepted an unlikely jump
-
-Every review is written to a trace in the same style as the assignment:
-  Observation -> Agent -> Action -> Finding -> ... -> Conclusion
-
-Works without an API key too: then it only uses look_back / look_forward
-and never forces a state it has no evidence for.
-
-The VLM answers are cached in outputs/agent_cache/, so re-running gives the
-same result and does not use the API again.
-"""
-
 import base64
 import json
 import os
@@ -78,7 +40,6 @@ VLM_QUESTION = (
 )
 
 
-# ---------------------------------------------------------------------------
 def load_api_key():
     """GROQ_API_KEY from the environment or from a .env file in the project root."""
     if os.environ.get("GROQ_API_KEY"):
@@ -106,8 +67,6 @@ def merge_segments(segments):
             out.append(dict(s))
     return out
 
-
-# ---------------------------------------------------------------------------
 class Agent:
     def __init__(self, name, segments, video_path=None, use_vlm=True):
         self.name = name
@@ -121,7 +80,6 @@ class Agent:
         self.cache_file = CACHE_DIR / f"{name}.json"
         self.cache = json.loads(self.cache_file.read_text()) if self.cache_file.exists() else {}
 
-    # ---------------- tools ----------------
     def look_back(self, i, seconds=C.AGENT_CONTEXT_SEC):
         start = self.segments[i]["start_sec"] - seconds
         return self._summarise(start, self.segments[i]["start_sec"])
@@ -228,7 +186,6 @@ class Agent:
             return [round((a + b) / 2, 1)]
         return [round(a + (b - a) * f, 1) for f in (0.2, 0.5, 0.8)]
 
-    # ---------------- when to step in ----------------
     def triggers(self):
         found = []
         for i, s in enumerate(self.segments):
@@ -244,7 +201,7 @@ class Agent:
                 found.append((i, "implausible_transition"))
         return found
 
-    # ---------------- reviews ----------------
+    # reviews 
     def _describe(self, ctx):
         if not ctx["states"]:
             return "nothing (start/end of video)"
@@ -346,7 +303,6 @@ class Agent:
             return hypothesis, "context"
         return seg["state"], "unchanged"
 
-    # ---------------- main loop ----------------
     def run(self):
         for i, trigger in self.triggers():
             new_state, by = self.review(i, trigger)

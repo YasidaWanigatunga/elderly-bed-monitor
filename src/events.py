@@ -1,39 +1,3 @@
-"""
-events.py
----------
-Stage 5: timeline segments -> bed events.
-
-The assignment defines the events as SEQUENCES, not single frames:
-
-  BED_EXIT       in bed (lying / sitting)  ->  standing  ->  moving away
-  RETURN_TO_BED  out of bed  ->  approaches  ->  sits on bed  ->  lies down
-
-and "simply sitting up or changing sleeping position should not count".
-
-How we implement it:
-  Every state belongs to a bed status:
-      IN   = LYING_IN_BED, SITTING_ON_BED
-      OUT  = STANDING, WALKING, SITTING_OUTSIDE_BED, OUT_OF_BED
-      (UNKNOWN does not change the status: we do not guess)
-
-  BED_EXIT
-    start_time      first moment the status goes IN -> OUT
-    confirmed_time  when he starts moving away (WALKING / OUT_OF_BED /
-                    sitting elsewhere) or has stayed out for
-                    EXIT_CONFIRM_SEC, whichever comes first
-    If he gets back on the bed before confirmation, it is NOT an exit; it is
-    recorded as a "brief_stand" note (the "standing briefly and sitting back
-    down" case).
-
-  RETURN_TO_BED
-    start_time      first moment the status goes OUT -> IN
-    confirmed_time  when he lies down, or has stayed on the bed for
-                    RETURN_CONFIRM_SEC, whichever comes first
-
-Sitting up and rolling over never change the status (both are IN), so they
-can never create an exit. That is the main protection against false exits.
-"""
-
 from src import config as C
 from src.classifier import IN_BED, LYING, OUT, SIT_OUT, STAND, UNKNOWN, WALK
 
@@ -91,7 +55,6 @@ def detect_events(segments):
                 pending["segs"].append(seg)
             continue
 
-        # ---- a transition may be starting ----
         if pending is None and st != bed:
             pending = {"to": st, "start": seg["start_sec"], "segs": [seg],
                        "prev": last_in_state if bed == "IN" else last_out_state,
@@ -100,7 +63,6 @@ def detect_events(segments):
             if st == pending["to"]:
                 pending["segs"].append(seg)
             else:
-                # went back before confirmation
                 if pending["to"] == "OUT":
                     notes.append({"note": "brief_stand", "start_time": hms(pending["start"]),
                                   "end_time": hms(seg["start_sec"]),
@@ -117,7 +79,6 @@ def detect_events(segments):
                 last_out_state = seg["state"]
             continue
 
-        # ---- is the pending transition confirmed? ----
         known = [s for s in pending["segs"] if status(s["state"]) == pending["to"]]
         held = sum(s["end_sec"] - max(s["start_sec"], pending["start"]) for s in known)
         confirm_at = None

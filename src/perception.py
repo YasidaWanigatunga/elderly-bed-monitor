@@ -1,42 +1,3 @@
-"""
-perception.py
--------------
-Stage 1 of the system: turn video into numbers.
-
-For every sampled frame (SAMPLE_FPS per second) we:
-  1. Detect people and their 17 body keypoints     (YOLO11n-pose)
-  2. Detect the bed                                  (YOLO11n, COCO class "bed")
-  3. Pick the patient if several people are visible  (caregiver handling)
-  4. Compute simple, explainable features:
-
-     person_found   is anyone visible?
-     kp_visible     fraction of the 17 keypoints that are confidently visible
-                    (low when covered by a blanket, occluded or in the dark)
-     torso_angle    angle of the shoulder->hip line from vertical, degrees
-                    0 = upright (sitting/standing), 90 = horizontal (lying)
-     aspect         person box width / height  (lying people are wide)
-     bed_found      is a bed box available (tracked, remembered for a while)
-     bed_seen       was the bed detected in THIS frame (False when the camera
-                    is blocked or dark; used to tell "under blanket" from
-                    "camera blocked")
-     bed_overlap    fraction of the person box that lies inside the bed box
-     hip_on_bed     are the hips inside the bed box?
-     knee_angle     hip-knee-ankle angle, degrees (180 = straight leg)
-     motion         hip movement per second, in "body heights"
-     brightness     mean image brightness (0-255), to detect poor lighting
-
-Why keypoints + rules instead of a trained classifier?
-  No training data of our own is needed, every decision is explainable,
-  and it runs on a laptop CPU.
-
-Run:
-  python -m src.perception data/sequences/seq1_exit_and_return.mp4
-  python -m src.perception data/sequences/seq1_exit_and_return.mp4 --viz
-Output:
-  outputs/features/<video>.csv      (one row per sampled frame)
-  outputs/viz/<video>_viz.mp4       (with --viz: skeleton + bed drawn)
-"""
-
 import argparse
 import csv
 import math
@@ -48,7 +9,6 @@ from ultralytics import YOLO
 
 from src import config as C
 
-# COCO keypoint indices
 L_SH, R_SH, L_HIP, R_HIP = 5, 6, 11, 12
 L_KNEE, R_KNEE, L_ANK, R_ANK = 13, 14, 15, 16
 
@@ -58,9 +18,6 @@ FEATURES = ["t", "n_persons", "person_found", "person_conf", "kp_visible",
             "px1", "py1", "px2", "py2", "bx1", "by1", "bx2", "by2"]
 
 
-# ---------------------------------------------------------------------------
-# Small geometry helpers
-# ---------------------------------------------------------------------------
 def midpoint(kp, conf, a, b):
     """Midpoint of two keypoints; falls back to whichever one is visible."""
     pts = [kp[i] for i in (a, b) if conf[i] >= C.KP_CONF]
@@ -93,10 +50,6 @@ def inside(pt, box, margin=0.0):
             and box[1] - margin <= pt[1] <= box[3] + margin)
 
 
-# ---------------------------------------------------------------------------
-# Bed tracking: detection is noisy frame to frame, so smooth it and
-# remember the last good box for a while (the bed does not move).
-# ---------------------------------------------------------------------------
 class BedTracker:
     def __init__(self):
         self.box = None
@@ -113,10 +66,6 @@ class BedTracker:
         return self.box
 
 
-# ---------------------------------------------------------------------------
-# Patient selection: if several people are visible (e.g. a caregiver),
-# prefer the one closest to where the patient was, then the one on the bed.
-# ---------------------------------------------------------------------------
 def pick_patient(persons, bed_box, prev_center):
     def score(p):
         s = p["conf"]
@@ -130,7 +79,6 @@ def pick_patient(persons, bed_box, prev_center):
     return max(persons, key=score)
 
 
-# ---------------------------------------------------------------------------
 def extract_features(person, bed_box, prev_hip, dt):
     kp, kc = person["kp"], person["kp_conf"]
     x1, y1, x2, y2 = person["box"]
@@ -188,7 +136,6 @@ def draw(frame, persons, patient, bed_box, row):
     return out
 
 
-# ---------------------------------------------------------------------------
 def run(video_path, out_dir="outputs", viz=False):
     video_path = Path(video_path)
     pose_model, det_model = YOLO(C.POSE_MODEL), YOLO(C.DET_MODEL)
@@ -222,7 +169,7 @@ def run(video_path, out_dir="outputs", viz=False):
             break
         t = idx / fps
 
-        # --- bed ---
+        # bed 
         det = det_model(frame, classes=[C.BED_CLASS_ID], conf=C.BED_CONF, verbose=False)[0]
         det_box = None
         if len(det.boxes):
@@ -230,7 +177,7 @@ def run(video_path, out_dir="outputs", viz=False):
             det_box = det.boxes.xyxy[i].cpu().numpy()
         bed_box = bed.update(det_box, t)
 
-        # --- people + keypoints ---
+        # people + keypoints
         res = pose_model(frame, conf=C.PERSON_CONF, verbose=False)[0]
         persons = []
         if res.keypoints is not None and len(res.boxes):

@@ -1,15 +1,4 @@
-"""
-config.py
----------
-All tunable numbers in one place, so they are easy to find and explain
-(and easy to change live in the interview).
-
-Thresholds were chosen by looking at check_features.py output
-(median feature values per true state), not by trial and error on the
-test videos.
-"""
-
-# ---- Perception --------------------------------------------------------
+# Perception
 SAMPLE_FPS = 2.0            # frames analysed per second of video
 POSE_MODEL = "yolo11n-pose.pt"   # person + 17 body keypoints (COCO format)
 DET_MODEL = "yolo11n.pt"         # general detector, used for the "bed" class
@@ -20,7 +9,7 @@ KP_CONF = 0.5               # a keypoint counts as "visible" above this
 BED_SMOOTHING = 0.7         # EMA weight on the previous bed box (0 = no smoothing)
 BED_MEMORY_SEC = 30.0       # keep using the last bed box this long if bed not seen
 
-# ---- Frame classifier (one frame at a time) ----------------------------
+# Frame classifier (one frame at a time)
 # Measured medians: lying torso ~78 deg, sitting ~10, standing ~22.
 LYING_TORSO_DEG = 50        # torso tilted more than this = body is horizontal
 UPRIGHT_TORSO_DEG = 35      # torso tilted less than this = body is upright
@@ -38,7 +27,7 @@ MIN_KP_VISIBLE = 0.25       # fewer visible keypoints than this = pose not relia
 DARK_BRIGHTNESS = 40        # darker than this = low light, reduce confidence
 BLACKOUT_BRIGHTNESS = 8     # darker than this = camera shows nothing
 
-# ---- Temporal layer (across frames) ------------------------------------
+# Temporal layer (across frames) 
 SMOOTH_WINDOW_SEC = 2.5     # confidence-weighted vote over this window
 MIN_DWELL_SEC = 1.5         # a new state must last this long to be accepted
 IMPLAUSIBLE_DWELL_SEC = 3.0 # an "impossible" jump needs this much evidence
@@ -46,7 +35,7 @@ HIDDEN_IN_BED_MAX_SEC = 60  # person invisible but bed visible: assume still
                             # in bed (under blanket) for at most this long
 EDGE_MARGIN = 0.05          # person box this close to the frame edge = "at the edge"
 
-# ---- Agent -----------------------------------------------------------------
+# Agent
 AGENT_CONTEXT_SEC = 10.0          # how far look_back / look_forward look
 AGENT_SHORT_SEGMENT_SEC = 5.0     # in-bed segments this short are suspicious
 AGENT_LOW_CONFIDENCE = 0.5        # segments below this confidence get reviewed
@@ -56,15 +45,12 @@ VLM_MODEL = "qwen/qwen3.8-27b"    # Groq vision model (check console.groq.com/do
 VLM_IMAGE_WIDTH = 640             # frames are resized to this width before sending
 VLM_MIN_INTERVAL_SEC = 2.5        # wait between calls (free tier: 30 requests/min)
 
-# ---- Bed events ----------------------------------------------------------
+# Bed events
 EXIT_CONFIRM_SEC = 5.0      # out of bed this long (or starts walking) = confirmed exit
 RETURN_CONFIRM_SEC = 10.0   # back on bed this long (or lies down) = confirmed return
 EVENT_MATCH_TOLERANCE_SEC = 10.0  # evaluation: predicted vs true event start
 
-# ---- Alerts --------------------------------------------------------------
-# "realistic": values for a real night of monitoring.
-# "demo":      the same rules scaled down, because our test videos are only
-#              3-4 minutes long (a 15-minute rule would never fire in them).
+# Alerts
 ALERT_PROFILE = "demo"
 ALERT_PROFILES = {
     "realistic": {"PROLONGED_ABSENCE_SEC": 900,   # 15 min out of bed at night

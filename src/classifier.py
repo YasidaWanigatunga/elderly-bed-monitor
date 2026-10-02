@@ -1,37 +1,3 @@
-"""
-classifier.py
--------------
-Stage 2: look at ONE frame's features and guess the state.
-
-Output for every frame:
-  state       one of the 7 states, or NO_PERSON (resolved later by the
-              temporal layer, because "nobody visible" means different
-              things depending on what happened before)
-  confidence  0..1, how much we trust this single-frame guess
-  reason      a short human-readable explanation (used in the timeline
-              and by the agent)
-
-The rules are a small decision tree. Each branch uses the features that
-check_features.py showed to separate the states:
-
-    blackout?                    -> UNKNOWN
-    nobody detected?             -> NO_PERSON
-    too few keypoints visible?   -> UNKNOWN
-    hips on the bed?
-        horizontal body          -> LYING_IN_BED
-        straight legs, tall box  -> STANDING   (standing beside the bed;
-                                               2-D box overlap fooled us)
-        otherwise                -> SITTING_ON_BED
-    hips off the bed?
-        horizontal body          -> UNKNOWN    (possible fall: flagged)
-        bent knees, not moving   -> SITTING_OUTSIDE_BED
-        moving                   -> WALKING
-        otherwise                -> STANDING
-
-This stage is deliberately simple. It WILL make mistakes on single
-frames (e.g. bending over the bed). The temporal layer fixes most of them.
-"""
-
 from dataclasses import dataclass, field
 
 from src import config as C
@@ -76,7 +42,7 @@ def classify(row):
     kp, motion = f.get("kp_visible") or 0.0, f.get("motion")
     bright = f.get("brightness") or 0.0
 
-    # --- 1. can we see anything at all? ---------------------------------
+    #1. can we see anything at all? 
     if bright < C.BLACKOUT_BRIGHTNESS:
         return Observation(t, UNKNOWN, 0.9, "camera shows nothing (blackout)",
                            ["blackout"], f)
@@ -88,7 +54,7 @@ def classify(row):
                            f"person detected but only {kp:.0%} of body visible",
                            ["occluded"], f)
 
-    # --- 2. body shape --------------------------------------------------
+    #2. body shape
     if torso is not None:
         horizontal = torso > C.LYING_TORSO_DEG and (aspect or 0) > C.LYING_MIN_ASPECT
         upright = torso < C.UPRIGHT_TORSO_DEG
@@ -103,7 +69,7 @@ def classify(row):
     bent_legs = knee is not None and knee < C.SIT_KNEE_DEG
     moving = motion is not None and motion > C.WALK_MOTION
 
-    # --- 3. where is the body relative to the bed? ----------------------
+    # 3. where is the body relative to the bed? 
     if f.get("hip_on_bed") is not None:
         on_bed = f["hip_on_bed"] == 1
     elif f.get("bed_overlap") is not None:
@@ -111,7 +77,7 @@ def classify(row):
     else:
         on_bed = None                                  # no bed detected
 
-    # --- 4. decide ------------------------------------------------------
+    # 4. decide
     flags = []
     if on_bed is None:
         flags.append("no_bed")
@@ -153,7 +119,7 @@ def classify(row):
             state, why = STAND, "hips off bed, upright, not moving"
         base = 0.55
 
-    # --- 5. confidence --------------------------------------------------
+    # 5. confidence 
     conf = base + 0.25 * kp + 0.2 * _clip(shape_margin)
     if not upright and not horizontal:
         conf -= 0.1                                    # in-between posture
