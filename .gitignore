@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+data/pexels/clips/*.mp4
+data/sequences/*.mp4
+outputs/viz/
+*.pt

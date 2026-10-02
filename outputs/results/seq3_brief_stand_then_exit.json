@@ -1,0 +1,447 @@
+{
+  "video": "seq3_brief_stand_then_exit",
+  "duration_sec": 253.4,
+  "summary": {
+    "observation_duration_sec": 253,
+    "activity_duration_sec": {
+      "lying_in_bed": 42,
+      "sitting_on_bed": 60,
+      "sitting_outside_bed": 0,
+      "standing": 148,
+      "walking": 3,
+      "out_of_bed": 0,
+      "unknown": 0
+    },
+    "activity_summary": {
+      "lying_in_bed": "0m 42s",
+      "sitting_on_bed": "1m 00s",
+      "standing": "2m 28s",
+      "walking": "0m 03s"
+    },
+    "bed_exit_count": 1,
+    "bed_return_count": 0,
+    "total_in_bed_sec": 102,
+    "total_out_of_bed_sec": 151,
+    "longest_out_of_bed_period_sec": 151,
+    "final_state": "standing"
+  },
+  "overall_decision": "ALERT",
+  "events": [
+    {
+      "event": "bed_exit",
+      "start_time": "00:01:42",
+      "confirmed_time": "00:01:47",
+      "start_sec": 102.24,
+      "confirmed_sec": 107.24,
+      "previous_state": "sitting_on_bed",
+      "current_state": "standing",
+      "confidence": 0.82,
+      "decision": "ALERT"
+    }
+  ],
+  "notes": [],
+  "alerts": [
+    {
+      "decision": "MONITOR",
+      "rule": "bed_exit",
+      "time": "00:01:47",
+      "time_sec": 107.24,
+      "explanation": "left the bed (sitting_on_bed -> standing)"
+    },
+    {
+      "decision": "ALERT",
+      "rule": "prolonged_absence",
+      "time": "00:03:42",
+      "time_sec": 222.24,
+      "explanation": "out of bed for 151s (limit 120s)"
+    }
+  ],
+  "timeline": [
+    {
+      "start": "00:00",
+      "end": "00:42",
+      "start_sec": 0.0,
+      "end_sec": 42.24,
+      "state": "LYING_IN_BED",
+      "duration_sec": 42.2,
+      "confidence": 0.77,
+      "reason": "hips on bed, torso 84 deg from vertical",
+      "flags": []
+    },
+    {
+      "start": "00:42",
+      "end": "01:42",
+      "start_sec": 42.24,
+      "end_sec": 102.24,
+      "state": "SITTING_ON_BED",
+      "duration_sec": 60.0,
+      "confidence": 0.79,
+      "reason": "kept LYING_IN_BED (brief 'SITTING_ON_BED' not trusted yet)",
+      "flags": [
+        "ambiguous_sit_or_stand"
+      ]
+    },
+    {
+      "start": "01:42",
+      "end": "03:36",
+      "start_sec": 102.24,
+      "end_sec": 216.48,
+      "state": "STANDING",
+      "duration_sec": 114.2,
+      "confidence": 0.83,
+      "reason": "kept SITTING_ON_BED (brief 'STANDING' not trusted yet)",
+      "flags": [
+        "agent_corrected"
+      ]
+    },
+    {
+      "start": "03:36",
+      "end": "03:38",
+      "start_sec": 216.48,
+      "end_sec": 217.92,
+      "state": "WALKING",
+      "duration_sec": 1.4,
+      "confidence": 0.4,
+      "reason": "kept STANDING (brief 'WALKING' not trusted yet)",
+      "flags": []
+    },
+    {
+      "start": "03:38",
+      "end": "03:45",
+      "start_sec": 217.92,
+      "end_sec": 224.64,
+      "state": "STANDING",
+      "duration_sec": 6.7,
+      "confidence": 0.68,
+      "reason": "kept WALKING (brief 'STANDING' not trusted yet)",
+      "flags": []
+    },
+    {
+      "start": "03:45",
+      "end": "03:46",
+      "start_sec": 224.64,
+      "end_sec": 226.08,
+      "state": "WALKING",
+      "duration_sec": 1.4,
+      "confidence": 0.37,
+      "reason": "kept STANDING (brief 'WALKING' not trusted yet)",
+      "flags": []
+    },
+    {
+      "start": "03:46",
+      "end": "04:13",
+      "start_sec": 226.08,
+      "end_sec": 253.44,
+      "state": "STANDING",
+      "duration_sec": 27.4,
+      "confidence": 0.66,
+      "reason": "agent (context+vlm): SITTING_ON_BED -> STANDING",
+      "flags": [
+        "agent_corrected"
+      ]
+    }
+  ],
+  "agent": {
+    "vlm_used": true,
+    "vlm_calls": 1,
+    "reviews": [
+      {
+        "segment": "03:20-03:22 SITTING_ON_BED (conf 0.38)",
+        "trigger": "short_ambiguous_in_bed",
+        "observation": "SITTING_ON_BED for only 1s with low confidence; hips overlap the bed box in 2-D",
+        "agent": "One frame cannot tell sitting on the bed from standing beside it.",
+        "steps": [
+          {
+            "action": "Analyze previous segment",
+            "finding": "previous 10s: STANDING 10s"
+          },
+          {
+            "action": "Analyze following segment",
+            "finding": "next 10s: STANDING 10s"
+          },
+          {
+            "action": "Check neighbouring segments",
+            "finding": "directly before: STANDING, directly after: STANDING"
+          },
+          {
+            "action": "Compare context",
+            "finding": "sandwiched between out-of-bed segments: a real sit-down of only 1s is unlikely; probably standing beside the bed"
+          },
+          {
+            "action": "Ask vision-language model",
+            "finding": "answer C (STANDING), confidence 0.95: The person is standing upright next to the bed, leaning over to smooth the duvet, with their feet on the floor."
+          }
+        ],
+        "conclusion": "SITTING_ON_BED -> STANDING",
+        "decided_by": "context+vlm",
+        "new_state": "STANDING"
+      },
+      {
+        "segment": "03:46-03:48 SITTING_ON_BED (conf 0.45)",
+        "trigger": "short_ambiguous_in_bed",
+        "observation": "SITTING_ON_BED for only 1s with low confidence; hips overlap the bed box in 2-D",
+        "agent": "One frame cannot tell sitting on the bed from standing beside it.",
+        "steps": [
+          {
+            "action": "Analyze previous segment",
+            "finding": "previous 10s: STANDING 7s, WALKING 3s"
+          },
+          {
+            "action": "Analyze following segment",
+            "finding": "next 10s: STANDING 8s, SITTING_ON_BED 2s"
+          },
+          {
+            "action": "Check neighbouring segments",
+            "finding": "directly before: WALKING, directly after: STANDING"
+          },
+          {
+            "action": "Compare context",
+            "finding": "sandwiched between out-of-bed segments: a real sit-down of only 1s is unlikely; probably standing beside the bed"
+          },
+          {
+            "action": "Ask vision-language model",
+            "finding": "answer C (STANDING), confidence 0.95: The person is standing on the floor beside the bed and bending over to smooth the sheets."
+          }
+        ],
+        "conclusion": "SITTING_ON_BED -> STANDING",
+        "decided_by": "context+vlm",
+        "new_state": "STANDING"
+      },
+      {
+        "segment": "03:50-03:52 SITTING_ON_BED (conf 0.48)",
+        "trigger": "short_ambiguous_in_bed",
+        "observation": "SITTING_ON_BED for only 2s with low confidence; hips overlap the bed box in 2-D",
+        "agent": "One frame cannot tell sitting on the bed from standing beside it.",
+        "steps": [
+          {
+            "action": "Analyze previous segment",
+            "finding": "previous 10s: STANDING 9s, WALKING 1s"
+          },
+          {
+            "action": "Analyze following segment",
+            "finding": "next 10s: STANDING 10s"
+          },
+          {
+            "action": "Check neighbouring segments",
+            "finding": "directly before: STANDING, directly after: STANDING"
+          },
+          {
+            "action": "Compare context",
+            "finding": "sandwiched between out-of-bed segments: a real sit-down of only 2s is unlikely; probably standing beside the bed"
+          },
+          {
+            "action": "Ask vision-language model",
+            "finding": "answer C (STANDING), confidence 0.95: The person is standing upright next to the bed, leaning over to smooth the sheets, with their feet on the floor."
+          }
+        ],
+        "conclusion": "SITTING_ON_BED -> STANDING",
+        "decided_by": "context+vlm",
+        "new_state": "STANDING"
+      },
+      {
+        "segment": "04:06-04:07 SITTING_ON_BED (conf 0.38)",
+        "trigger": "short_ambiguous_in_bed",
+        "observation": "SITTING_ON_BED for only 1s with low confidence; hips overlap the bed box in 2-D",
+        "agent": "One frame cannot tell sitting on the bed from standing beside it.",
+        "steps": [
+          {
+            "action": "Analyze previous segment",
+            "finding": "previous 10s: STANDING 10s"
+          },
+          {
+            "action": "Analyze following segment",
+            "finding": "next 10s: STANDING 6s"
+          },
+          {
+            "action": "Check neighbouring segments",
+            "finding": "directly before: STANDING, directly after: STANDING"
+          },
+          {
+            "action": "Compare context",
+            "finding": "sandwiched between out-of-bed segments: a real sit-down of only 1s is unlikely; probably standing beside the bed"
+          },
+          {
+            "action": "Ask vision-language model",
+            "finding": "answer C (STANDING), confidence 0.95: The person is standing on the floor beside the bed, bending over to smooth out the bedding."
+          }
+        ],
+        "conclusion": "SITTING_ON_BED -> STANDING",
+        "decided_by": "context+vlm",
+        "new_state": "STANDING"
+      }
+    ]
+  },
+  "evaluation": {
+    "frame_only": {
+      "accuracy": 0.534,
+      "frames": 528,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.889,
+        "SITTING_ON_BED": 0.925,
+        "STANDING": 0.703,
+        "WALKING": 0.005
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 80,
+          "UNKNOWN": 6,
+          "SITTING_ON_BED": 4
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 111,
+          "WALKING": 2,
+          "LYING_IN_BED": 6,
+          "STANDING": 1
+        },
+        "STANDING": {
+          "WALKING": 10,
+          "SITTING_ON_BED": 21,
+          "STANDING": 90,
+          "SITTING_OUTSIDE_BED": 6,
+          "UNKNOWN": 1
+        },
+        "WALKING": {
+          "UNKNOWN": 2,
+          "STANDING": 187,
+          "WALKING": 1
+        }
+      }
+    },
+    "temporal_no_agent": {
+      "accuracy": 0.595,
+      "frames": 528,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.978,
+        "SITTING_ON_BED": 1.0,
+        "STANDING": 0.828,
+        "WALKING": 0.0
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 88,
+          "SITTING_ON_BED": 2
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 120
+        },
+        "STANDING": {
+          "SITTING_ON_BED": 16,
+          "STANDING": 106,
+          "WALKING": 6
+        },
+        "WALKING": {
+          "STANDING": 190
+        }
+      }
+    },
+    "with_temporal": {
+      "accuracy": 0.619,
+      "frames": 528,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.978,
+        "SITTING_ON_BED": 1.0,
+        "STANDING": 0.93,
+        "WALKING": 0.0
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 88,
+          "SITTING_ON_BED": 2
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 120
+        },
+        "STANDING": {
+          "SITTING_ON_BED": 3,
+          "STANDING": 119,
+          "WALKING": 6
+        },
+        "WALKING": {
+          "STANDING": 190
+        }
+      }
+    },
+    "durations": {
+      "LYING_IN_BED": {
+        "true_sec": 42.8,
+        "pred_sec": 42.2,
+        "error_sec": -0.6
+      },
+      "SITTING_ON_BED": {
+        "true_sec": 57.7,
+        "pred_sec": 60.0,
+        "error_sec": 2.3
+      },
+      "STANDING": {
+        "true_sec": 61.7,
+        "pred_sec": 148.3,
+        "error_sec": 86.6
+      },
+      "WALKING": {
+        "true_sec": 91.0,
+        "pred_sec": 2.8,
+        "error_sec": -88.2
+      }
+    },
+    "true_events": [
+      {
+        "event": "bed_exit",
+        "start_time": "00:01:41",
+        "confirmed_time": "00:01:42",
+        "start_sec": 101.48,
+        "confirmed_sec": 102.2,
+        "previous_state": "sitting_on_bed",
+        "current_state": "walking",
+        "confidence": 1.0
+      }
+    ],
+    "events_no_agent": {
+      "bed_exit": {
+        "true": 1,
+        "predicted": 1,
+        "correct": 1,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "timing_errors_sec": [
+          0.8
+        ]
+      },
+      "return_to_bed": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      }
+    },
+    "events": {
+      "bed_exit": {
+        "true": 1,
+        "predicted": 1,
+        "correct": 1,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "timing_errors_sec": [
+          0.8
+        ]
+      },
+      "return_to_bed": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      }
+    }
+  }
+}

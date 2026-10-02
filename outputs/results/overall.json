@@ -1,0 +1,54 @@
+{
+  "videos": 4,
+  "frames": 1792,
+  "accuracy_frame_only": 0.761,
+  "accuracy_temporal_no_agent": 0.844,
+  "accuracy_final": 0.861,
+  "events": {
+    "bed_exit": {
+      "true": 3,
+      "predicted": 3,
+      "correct": 3,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "return_to_bed": {
+      "true": 2,
+      "predicted": 2,
+      "correct": 2,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "events_no_agent": {
+    "bed_exit": {
+      "true": 3,
+      "predicted": 3,
+      "correct": 1,
+      "false_detections": 2,
+      "missed": 2,
+      "precision": 0.333,
+      "recall": 0.333
+    },
+    "return_to_bed": {
+      "true": 2,
+      "predicted": 2,
+      "correct": 2,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "mean_abs_duration_error_sec": {
+    "LYING_IN_BED": 0.3,
+    "SITTING_ON_BED": 2.3,
+    "STANDING": 29.4,
+    "WALKING": 30.9,
+    "UNKNOWN": 0.4
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "video": "seq2_no_exit_long_edge_sit",
+  "duration_sec": 251.5,
+  "summary": {
+    "observation_duration_sec": 252,
+    "activity_duration_sec": {
+      "lying_in_bed": 84,
+      "sitting_on_bed": 167,
+      "sitting_outside_bed": 0,
+      "standing": 0,
+      "walking": 0,
+      "out_of_bed": 0,
+      "unknown": 0
+    },
+    "activity_summary": {
+      "lying_in_bed": "1m 24s",
+      "sitting_on_bed": "2m 47s"
+    },
+    "bed_exit_count": 0,
+    "bed_return_count": 0,
+    "total_in_bed_sec": 251,
+    "total_out_of_bed_sec": 0,
+    "longest_out_of_bed_period_sec": 0,
+    "final_state": "lying_in_bed"
+  },
+  "overall_decision": "MONITOR",
+  "events": [],
+  "notes": [],
+  "alerts": [
+    {
+      "decision": "MONITOR",
+      "rule": "long_sitting_on_bed",
+      "time": "00:02:17",
+      "time_sec": 137.04,
+      "explanation": "sitting on the bed for 167s (limit 90s)"
+    }
+  ],
+  "timeline": [
+    {
+      "start": "00:00",
+      "end": "00:47",
+      "start_sec": 0.0,
+      "end_sec": 47.04,
+      "state": "LYING_IN_BED",
+      "duration_sec": 47.0,
+      "confidence": 0.75,
+      "reason": "hips on bed, torso 84 deg from vertical",
+      "flags": []
+    },
+    {
+      "start": "00:47",
+      "end": "03:34",
+      "start_sec": 47.04,
+      "end_sec": 214.08,
+      "state": "SITTING_ON_BED",
+      "duration_sec": 167.0,
+      "confidence": 0.91,
+      "reason": "kept LYING_IN_BED (brief 'SITTING_ON_BED' not trusted yet)",
+      "flags": [
+        "ambiguous_sit_or_stand"
+      ]
+    },
+    {
+      "start": "03:34",
+      "end": "04:12",
+      "start_sec": 214.08,
+      "end_sec": 251.52,
+      "state": "LYING_IN_BED",
+      "duration_sec": 37.4,
+      "confidence": 0.74,
+      "reason": "kept SITTING_ON_BED (brief 'LYING_IN_BED' not trusted yet)",
+      "flags": []
+    }
+  ],
+  "agent": {
+    "vlm_used": true,
+    "vlm_calls": 0,
+    "reviews": []
+  },
+  "evaluation": {
+    "frame_only": {
+      "accuracy": 0.947,
+      "frames": 524,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.875,
+        "SITTING_ON_BED": 0.983
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 154,
+          "UNKNOWN": 16,
+          "SITTING_ON_BED": 5,
+          "WALKING": 1
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 342,
+          "UNKNOWN": 1,
+          "STANDING": 3,
+          "LYING_IN_BED": 2
+        }
+      }
+    },
+    "temporal_no_agent": {
+      "accuracy": 0.992,
+      "frames": 524,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.989,
+        "SITTING_ON_BED": 0.994
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 174,
+          "SITTING_ON_BED": 2
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 346,
+          "LYING_IN_BED": 2
+        }
+      }
+    },
+    "with_temporal": {
+      "accuracy": 0.992,
+      "frames": 524,
+      "per_state_recall": {
+        "LYING_IN_BED": 0.989,
+        "SITTING_ON_BED": 0.994
+      },
+      "confusion": {
+        "LYING_IN_BED": {
+          "LYING_IN_BED": 174,
+          "SITTING_ON_BED": 2
+        },
+        "SITTING_ON_BED": {
+          "SITTING_ON_BED": 346,
+          "LYING_IN_BED": 2
+        }
+      }
+    },
+    "durations": {
+      "LYING_IN_BED": {
+        "true_sec": 84.6,
+        "pred_sec": 84.4,
+        "error_sec": -0.2
+      },
+      "SITTING_ON_BED": {
+        "true_sec": 166.8,
+        "pred_sec": 167.0,
+        "error_sec": 0.2
+      }
+    },
+    "true_events": [],
+    "events_no_agent": {
+      "bed_exit": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      },
+      "return_to_bed": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      }
+    },
+    "events": {
+      "bed_exit": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      },
+      "return_to_bed": {
+        "true": 0,
+        "predicted": 0,
+        "correct": 0,
+        "false_detections": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "timing_errors_sec": []
+      }
+    }
+  }
+}

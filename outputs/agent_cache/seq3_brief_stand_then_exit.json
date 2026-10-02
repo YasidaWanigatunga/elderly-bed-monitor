@@ -1,0 +1,26 @@
+{
+  "226.4,226.8,227.2": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing on the floor beside the bed and bending over to smooth the sheets."
+  },
+  "246.0,246.5,246.9": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing on the floor beside the bed, bending over to smooth out the bedding."
+  },
+  "230.8,231.4,231.9": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing upright next to the bed, leaning over to smooth the sheets, with their feet on the floor."
+  },
+  "200.4,200.9,201.3": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing upright next to the bed, leaning over to smooth the duvet, with their feet on the floor."
+  }
+}

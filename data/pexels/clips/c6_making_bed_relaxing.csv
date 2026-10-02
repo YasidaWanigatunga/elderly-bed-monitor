@@ -1,0 +1,5 @@
+start_sec,end_sec,state
+0.0,4.5,WALKING
+4.5,8.0,STANDING
+8.0,11.0,SITTING_ON_BED
+11.0,17.84,LYING_IN_BED

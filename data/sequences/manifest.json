@@ -1,0 +1,214 @@
+{
+  "seq1_exit_and_return": {
+    "duration_sec": 177.4,
+    "story": "Sleeps, wakes, sits up, leaves the bed, moves around, comes back and lies down again. One exit, one return.",
+    "parts": [
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        60
+      ],
+      [
+        "play",
+        "c1",
+        0.0,
+        17.08
+      ],
+      [
+        "play",
+        "c3",
+        0.0,
+        12.48
+      ],
+      [
+        "loop",
+        "c4",
+        0.0,
+        7.6,
+        30
+      ],
+      [
+        "play",
+        "c6",
+        0.0,
+        17.84
+      ],
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        40
+      ]
+    ],
+    "degrade": []
+  },
+  "seq2_no_exit_long_edge_sit": {
+    "duration_sec": 251.44,
+    "story": "Sits up and sits on the bed edge for a long time but never leaves. Should give ZERO bed exits and a MONITOR decision.",
+    "parts": [
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        45
+      ],
+      [
+        "play",
+        "c1",
+        0.0,
+        17.08
+      ],
+      [
+        "loop",
+        "c5",
+        0.0,
+        23.9,
+        150
+      ],
+      [
+        "play",
+        "c6",
+        8.5,
+        17.84
+      ],
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        30
+      ]
+    ],
+    "degrade": []
+  },
+  "seq3_brief_stand_then_exit": {
+    "duration_sec": 253.16,
+    "story": "Stands up briefly and sits back down (NOT an exit), later really leaves and stays away for a long time.",
+    "parts": [
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        40
+      ],
+      [
+        "play",
+        "c1",
+        0.0,
+        17.08
+      ],
+      [
+        "play",
+        "c3",
+        0.0,
+        11.3
+      ],
+      [
+        "play",
+        "c3",
+        11.3,
+        9.0
+      ],
+      [
+        "loop",
+        "c5",
+        0.0,
+        23.9,
+        20
+      ],
+      [
+        "play",
+        "c3",
+        0.0,
+        12.48
+      ],
+      [
+        "loop",
+        "c2",
+        0.0,
+        3.9,
+        90
+      ],
+      [
+        "loop",
+        "c4",
+        0.0,
+        7.6,
+        60
+      ]
+    ],
+    "degrade": []
+  },
+  "seq4_hard_conditions": {
+    "duration_sec": 177.4,
+    "story": "Same story as seq1 but with poor lighting, a temporary occlusion and a short camera blackout.",
+    "parts": [
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        60
+      ],
+      [
+        "play",
+        "c1",
+        0.0,
+        17.08
+      ],
+      [
+        "play",
+        "c3",
+        0.0,
+        12.48
+      ],
+      [
+        "loop",
+        "c4",
+        0.0,
+        7.6,
+        30
+      ],
+      [
+        "play",
+        "c6",
+        0.0,
+        17.84
+      ],
+      [
+        "loop",
+        "c6",
+        12.0,
+        17.8,
+        40
+      ]
+    ],
+    "degrade": [
+      [
+        "dim",
+        0.0,
+        60.0
+      ],
+      [
+        "occlude",
+        70.0,
+        76.0
+      ],
+      [
+        "blackout",
+        100.0,
+        104.0
+      ],
+      [
+        "dim",
+        150.0,
+        190.0
+      ]
+    ]
+  }
+}

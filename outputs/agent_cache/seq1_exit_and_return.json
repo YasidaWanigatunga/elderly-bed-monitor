@@ -1,0 +1,20 @@
+{
+  "92.0,92.4,92.8": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing on the floor beside the bed, bending over to make the bed."
+  },
+  "112.1,112.6,113.0": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing on the floor beside the bed, bending over to smooth the bedding."
+  },
+  "96.5,97.2,97.9": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.95,
+    "reason": "The person is standing on the floor beside the bed, bending over to smooth out the bedspread."
+  }
+}
