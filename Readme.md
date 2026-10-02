@@ -31,7 +31,7 @@ Mean absolute duration error: **lying 0.3 s**, **sitting on bed 2.3 s**, **unkno
 
 The key trap in the assignment, *"sitting on the edge of the bed for a long time but not leaving"*, gives **0 false bed exits** and a correct `MONITOR` decision.
 
-The numbers above come from the agent in **context-only mode** (no API key), so anyone can reproduce them exactly.
+The numbers are **identical with and without the vision-language model**. In the VLM run, Groq's `qwen/qwen3.8-27b` reviewed the 9 ambiguous segments and agreed with the agent's temporal reasoning (and with the ground truth) on all 9, at confidence 0.95. See [Agent with the vision-language model](#agent-with-the-vision-language-model).
 
 ---
 
@@ -160,7 +160,8 @@ The agent decides **when** an observation needs more context, then gathers it.
 * The VLM must agree with ≥ 0.60 confidence. Replacing an `UNKNOWN` or clearing a fall needs ≥ 0.75.
 * Without a VLM, the agent uses temporal context only, and it **never invents evidence**: an `UNKNOWN` stays `UNKNOWN`.
 * For `possible_fall` without a VLM it stays **safety-first**: the alert is kept, because a false alarm is better than a missed fall.
-* VLM answers are cached (`outputs/agent_cache/`), so re-runs are reproducible and use no API calls.
+* VLM answers are cached (`outputs/agent_cache/`, committed), so re-runs are reproducible and use no API calls, even without a key.
+* If the VLM gives no usable answer (network error, rate limit), the trace says so and the agent falls back to temporal context.
 
 Every review is written to `outputs/results/<video>_agent_trace.md`, in the format the brief uses:
 
@@ -173,7 +174,9 @@ Action:      Analyze following segment  -> next 10s: STANDING 10s
 Action:      Check neighbouring segments -> directly before: STANDING, directly after: STANDING
 Action:      Compare context -> sandwiched between out-of-bed segments: a real sit-down of only
              2s is unlikely; probably standing beside the bed
-Conclusion:  SITTING_ON_BED -> STANDING (decided by: context)
+Action:      Ask vision-language model -> answer C (STANDING), confidence 0.95: The person is
+             standing on the floor beside the bed, bending over to smooth out the bedspread.
+Conclusion:  SITTING_ON_BED -> STANDING (decided by: context+vlm)
 ```
 
 This single correction is what moves bed-exit detection from 0.33 to 1.00 precision and recall.
@@ -306,6 +309,22 @@ Lying vs sitting is almost perfectly separated, and occlusion and blackout are r
 
 Durations sum to the video length by construction, since every analysed frame covers the time until the next one.
 
+### Agent with the vision-language model
+
+Run with `python -m src.pipeline --all` (Groq key in `.env`).
+
+| | Segments | VLM answer | Agrees with temporal context | Agrees with ground truth |
+|---|---|---|---|---|
+| Short "sitting" between standing periods (seq1, seq3, seq4) | 9 | **C: standing beside the bed**, confidence 0.95 (all 9) | 9 / 9 | 9 / 9 |
+| Blackout (seq4) | 1 | not asked: a black frame carries no evidence | | `UNKNOWN` kept ✅ |
+| Occlusion (seq4) | 1 | no usable answer | | `UNKNOWN` kept ✅ |
+
+Example reasoning returned by the model: *"The person is standing on the floor beside the bed, bending over to smooth out the bedspread."*
+
+The VLM changed no result, but it **independently confirmed** every correction that the temporal reasoning made. In a system that raises alerts about a real person, two independent sources of evidence agreeing is worth more than one. On these test videos the temporal context was already enough; the VLM matters most where context can't decide: a transition boundary, a possible fall (on the bed or on the floor?), or a person seen for the first time.
+
+The answers are cached in `outputs/agent_cache/`, which is committed to the repository. `python -m src.pipeline --all` therefore reproduces the VLM-backed traces **without a Groq key**: cached answers are reused, and only new questions need the API.
+
 **Caveat:** this is a small test set (one person, one room, 14 minutes, 3 exits, 2 returns). The event metrics show the logic works on these cases; they are not a statistically strong estimate.
 
 ---
@@ -402,8 +421,9 @@ python build_sequences.py            # 4 test videos + exact ground truth
 python -m src.perception data\sequences\seq1_exit_and_return.mp4 data\sequences\seq2_no_exit_long_edge_sit.mp4 data\sequences\seq3_brief_stand_then_exit.mp4 data\sequences\seq4_hard_conditions.mp4
 
 # 3. analysis + evaluation
-python -m src.pipeline --all --no-vlm   # reproducible numbers (as in this README)
-python -m src.pipeline --all            # with the Groq VLM (needs a key, see below)
+python -m src.pipeline --all --no-vlm   # agent with temporal context only
+python -m src.pipeline --all            # agent + VLM (uses the cached answers in outputs/agent_cache/;
+                                        # a Groq key is only needed for new questions)
 ```
 
 Optional helpers: `python check_features.py seq1_exit_and_return` (feature medians per true state) and `python label_tool.py <video>` (label a new clip).
@@ -413,7 +433,7 @@ Optional helpers: `python check_features.py seq1_exit_and_return` (feature media
 1. Create a free key at [console.groq.com](https://console.groq.com).
 2. Create a file named `.env` in the project root containing: `GROQ_API_KEY=your_key`. It is ignored by git.
 
-Without a key, everything still runs; the agent then uses temporal context only.
+Without a key, everything still runs. The agent reuses any cached VLM answers, and otherwise uses temporal context only.
 
 ---
 
@@ -440,6 +460,7 @@ data/pexels/clips/      clip labels (*.csv)
 data/sequences/         test-video ground truth (*.csv) + manifest.json
 outputs/features/       perception output per video
 outputs/results/        JSON reports, agent traces, overall.json
+outputs/agent_cache/    cached VLM answers (reproducible without an API key)
 docs/failures/          failure-case images
 ```
 

@@ -1,5 +1,5 @@
 # Agent trace: seq3_brief_stand_then_exit
-VLM used: yes (qwen/qwen3.8-27b), VLM calls this run: 1
+VLM used: yes (qwen/qwen3.8-27b), VLM calls this run: 0
 
 ## 1. 03:20-03:22 SITTING_ON_BED (conf 0.38)  [short_ambiguous_in_bed]
 **Observation:** SITTING_ON_BED for only 1s with low confidence; hips overlap the bed box in 2-D  

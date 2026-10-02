@@ -3,24 +3,24 @@
   "frames": 1792,
   "accuracy_frame_only": 0.761,
   "accuracy_temporal_no_agent": 0.844,
-  "accuracy_final": 0.861,
+  "accuracy_final": 0.855,
   "events": {
     "bed_exit": {
       "true": 3,
-      "predicted": 3,
+      "predicted": 4,
       "correct": 3,
-      "false_detections": 0,
+      "false_detections": 1,
       "missed": 0,
-      "precision": 1.0,
+      "precision": 0.75,
       "recall": 1.0
     },
     "return_to_bed": {
       "true": 2,
-      "predicted": 2,
+      "predicted": 3,
       "correct": 2,
-      "false_detections": 0,
+      "false_detections": 1,
       "missed": 0,
-      "precision": 1.0,
+      "precision": 0.667,
       "recall": 1.0
     }
   },
@@ -47,8 +47,8 @@
   "mean_abs_duration_error_sec": {
     "LYING_IN_BED": 0.3,
     "SITTING_ON_BED": 2.3,
-    "STANDING": 29.4,
+    "STANDING": 30.2,
     "WALKING": 30.9,
-    "UNKNOWN": 0.4
+    "UNKNOWN": 5.7
   }
 }

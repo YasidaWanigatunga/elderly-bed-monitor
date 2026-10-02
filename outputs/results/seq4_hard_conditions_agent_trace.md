@@ -1,5 +1,5 @@
 # Agent trace: seq4_hard_conditions
-VLM used: yes (qwen/qwen3.8-27b), VLM calls this run: 3
+VLM used: yes (qwen/qwen3.8-27b), VLM calls this run: 1
 
 ## 1. 01:11-01:16 UNKNOWN (conf 0.34)  [unknown]
 **Observation:** state UNKNOWN for 5s (occluded)  
@@ -8,7 +8,9 @@ VLM used: yes (qwen/qwen3.8-27b), VLM calls this run: 3
 **Finding:** previous 10s: SITTING_ON_BED 9s, LYING_IN_BED 1s  
 **Action:** Analyze following segment  
 **Finding:** next 10s: SITTING_ON_BED 10s  
-**Conclusion:** UNKNOWN confirmed (decided by: unchanged)
+**Action:** Ask vision-language model  
+**Finding:** answer C (STANDING), confidence 0.85: The person's arm is raised and their legs are visible in a standing posture next to the bed, indicating they are standing or bending over.  
+**Conclusion:** UNKNOWN -> STANDING (decided by: vlm)
 
 ## 2. 01:32-01:33 SITTING_ON_BED (conf 0.46)  [short_ambiguous_in_bed]
 **Observation:** SITTING_ON_BED for only 1s with low confidence; hips overlap the bed box in 2-D  

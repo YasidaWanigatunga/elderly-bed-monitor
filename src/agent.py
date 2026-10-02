@@ -73,12 +73,13 @@ class Agent:
         self.segments = [dict(s) for s in segments]
         self.video_path = video_path
         self.api_key = load_api_key() if use_vlm else None
-        self.use_vlm = bool(self.api_key and video_path and Path(video_path).exists())
         self.vlm_calls = 0
         self.trace = []
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         self.cache_file = CACHE_DIR / f"{name}.json"
         self.cache = json.loads(self.cache_file.read_text()) if self.cache_file.exists() else {}
+        self.use_vlm = bool(use_vlm and (self.api_key or self.cache)
+                            and video_path and Path(video_path).exists())
 
     def look_back(self, i, seconds=C.AGENT_CONTEXT_SEC):
         start = self.segments[i]["start_sec"] - seconds
@@ -122,6 +123,8 @@ class Agent:
         key = ",".join(f"{t:.1f}" for t in times)
         if key in self.cache:
             return self.cache[key]
+        if not self.api_key:                      # cache-only mode, answer not cached
+            return None
         images = [self._frame_b64(t) for t in times]
         images = [im for im in images if im]
         if not images:
@@ -201,7 +204,7 @@ class Agent:
                 found.append((i, "implausible_transition"))
         return found
 
-    # reviews 
+    # ---------------- reviews ----------------
     def _describe(self, ctx):
         if not ctx["states"]:
             return "nothing (start/end of video)"
@@ -299,10 +302,14 @@ class Agent:
         elif not self.use_vlm:
             steps.append(("Ask vision-language model", "not available (no API key): "
                           "using temporal context only"))
+        else:
+            steps.append(("Ask vision-language model", "no usable answer (request failed "
+                          "or not cached): using temporal context only"))
         if hypothesis:
             return hypothesis, "context"
         return seg["state"], "unchanged"
 
+    # ---------------- main loop ----------------
     def run(self):
         for i, trigger in self.triggers():
             new_state, by = self.review(i, trigger)

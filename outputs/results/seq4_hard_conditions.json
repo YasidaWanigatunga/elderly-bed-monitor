@@ -7,27 +7,49 @@
       "lying_in_bed": 109,
       "sitting_on_bed": 26,
       "sitting_outside_bed": 0,
-      "standing": 29,
+      "standing": 34,
       "walking": 4,
       "out_of_bed": 0,
-      "unknown": 10
+      "unknown": 4
     },
     "activity_summary": {
       "lying_in_bed": "1m 49s",
       "sitting_on_bed": "0m 26s",
-      "standing": "0m 29s",
+      "standing": "0m 34s",
       "walking": "0m 04s",
-      "unknown": "0m 10s"
+      "unknown": "0m 04s"
     },
-    "bed_exit_count": 1,
-    "bed_return_count": 1,
+    "bed_exit_count": 2,
+    "bed_return_count": 2,
     "total_in_bed_sec": 135,
-    "total_out_of_bed_sec": 33,
+    "total_out_of_bed_sec": 38,
     "longest_out_of_bed_period_sec": 37,
     "final_state": "lying_in_bed"
   },
   "overall_decision": "MONITOR",
   "events": [
+    {
+      "event": "bed_exit",
+      "start_time": "00:01:11",
+      "confirmed_time": "00:01:16",
+      "start_sec": 70.56,
+      "confirmed_sec": 75.56,
+      "previous_state": "sitting_on_bed",
+      "current_state": "standing",
+      "confidence": 0.61,
+      "decision": "MONITOR"
+    },
+    {
+      "event": "return_to_bed",
+      "start_time": "00:01:16",
+      "confirmed_time": "00:01:26",
+      "start_sec": 75.84,
+      "confirmed_sec": 85.84,
+      "previous_state": "standing",
+      "current_state": "sitting_on_bed",
+      "confidence": 0.53,
+      "decision": "NORMAL"
+    },
     {
       "event": "bed_exit",
       "start_time": "00:01:30",
@@ -55,10 +77,10 @@
   "alerts": [
     {
       "decision": "MONITOR",
-      "rule": "state_unknown",
-      "time": "00:01:14",
-      "time_sec": 73.56,
-      "explanation": "state could not be determined for 5s (agent_reviewed, occluded)"
+      "rule": "bed_exit",
+      "time": "00:01:16",
+      "time_sec": 75.56,
+      "explanation": "left the bed (sitting_on_bed -> standing)"
     },
     {
       "decision": "MONITOR",
@@ -109,12 +131,12 @@
       "end": "01:16",
       "start_sec": 70.56,
       "end_sec": 75.84,
-      "state": "UNKNOWN",
+      "state": "STANDING",
       "duration_sec": 5.3,
       "confidence": 0.34,
-      "reason": "kept SITTING_ON_BED (brief 'UNKNOWN' not trusted yet)",
+      "reason": "agent (vlm): UNKNOWN -> STANDING",
       "flags": [
-        "agent_reviewed",
+        "agent_corrected",
         "occluded"
       ]
     },
@@ -243,7 +265,7 @@
   ],
   "agent": {
     "vlm_used": true,
-    "vlm_calls": 3,
+    "vlm_calls": 1,
     "reviews": [
       {
         "segment": "01:11-01:16 UNKNOWN (conf 0.34)",
@@ -258,11 +280,15 @@
           {
             "action": "Analyze following segment",
             "finding": "next 10s: SITTING_ON_BED 10s"
+          },
+          {
+            "action": "Ask vision-language model",
+            "finding": "answer C (STANDING), confidence 0.85: The person's arm is raised and their legs are visible in a standing posture next to the bed, indicating they are standing or bending over."
           }
         ],
-        "conclusion": "UNKNOWN confirmed",
-        "decided_by": "unchanged",
-        "new_state": "UNKNOWN"
+        "conclusion": "UNKNOWN -> STANDING",
+        "decided_by": "vlm",
+        "new_state": "STANDING"
       },
       {
         "segment": "01:32-01:33 SITTING_ON_BED (conf 0.46)",
@@ -428,12 +454,12 @@
       }
     },
     "with_temporal": {
-      "accuracy": 0.935,
+      "accuracy": 0.905,
       "frames": 370,
       "per_state_recall": {
         "LYING_IN_BED": 0.991,
         "SITTING_ON_BED": 0.978,
-        "UNKNOWN": 0.905,
+        "UNKNOWN": 0.381,
         "STANDING": 0.841,
         "WALKING": 0.182
       },
@@ -448,7 +474,8 @@
         },
         "UNKNOWN": {
           "SITTING_ON_BED": 2,
-          "UNKNOWN": 19
+          "STANDING": 11,
+          "UNKNOWN": 8
         },
         "STANDING": {
           "SITTING_ON_BED": 3,
@@ -476,8 +503,8 @@
       },
       "STANDING": {
         "true_sec": 30.2,
-        "pred_sec": 28.8,
-        "error_sec": -1.4
+        "pred_sec": 34.1,
+        "error_sec": 3.9
       },
       "WALKING": {
         "true_sec": 5.5,
@@ -486,8 +513,8 @@
       },
       "UNKNOWN": {
         "true_sec": 10.0,
-        "pred_sec": 9.6,
-        "error_sec": -0.4
+        "pred_sec": 4.3,
+        "error_sec": -5.7
       }
     },
     "true_events": [
@@ -539,11 +566,11 @@
     "events": {
       "bed_exit": {
         "true": 1,
-        "predicted": 1,
+        "predicted": 2,
         "correct": 1,
-        "false_detections": 0,
+        "false_detections": 1,
         "missed": 0,
-        "precision": 1.0,
+        "precision": 0.5,
         "recall": 1.0,
         "timing_errors_sec": [
           2.4
@@ -551,11 +578,11 @@
       },
       "return_to_bed": {
         "true": 1,
-        "predicted": 1,
+        "predicted": 2,
         "correct": 1,
-        "false_detections": 0,
+        "false_detections": 1,
         "missed": 0,
-        "precision": 1.0,
+        "precision": 0.5,
         "recall": 1.0,
         "timing_errors_sec": [
           -0.4

@@ -10,5 +10,11 @@
     "state": "STANDING",
     "confidence": 0.95,
     "reason": "The person is standing on the floor beside the bed, bending over to smooth out the bedspread."
+  },
+  "71.6,73.2,74.8": {
+    "answer": "C",
+    "state": "STANDING",
+    "confidence": 0.85,
+    "reason": "The person's arm is raised and their legs are visible in a standing posture next to the bed, indicating they are standing or bending over."
   }
 }
